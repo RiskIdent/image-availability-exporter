@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	resolveMissingTotal = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "iae_image_not_found_errors_total",
-			Help: "The number of times an image was not found in the registry",
+	resolveMissingTotal = promauto.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "iae_image_missing",
+			Help: "Image missing in registry",
 		},
 		[]string{"image"},
 	)

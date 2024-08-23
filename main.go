@@ -34,7 +34,10 @@ func main() {
 			}
 			if !exists {
 				log.Errorf("image %s not found in registry", image)
-				resolveMissingTotal.WithLabelValues(image).Inc()
+				resolveMissingTotal.WithLabelValues(image).Set(1)
+			} else {
+				log.Infof("image %s found in registry", image)
+				resolveMissingTotal.WithLabelValues(image).Set(0)
 			}
 		}
 		time.Sleep(12 * time.Hour)
