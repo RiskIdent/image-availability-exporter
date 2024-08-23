@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-availability-exporter
+  labels:
+    app: image-availability-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-availability-exporter
+  template:
+    metadata:
+      name: image-availability-exporter
+      labels:
+        app: image-availability-exporter
+    spec:
+      volumes:
+        - name: docker-pull-secret
+          secret:
+            secretName: docker-pull-secret
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+      imagePullSecrets:
+        - name: docker-pull-secret
+      serviceAccountName: image-availability-exporter
+      containers:
+        - name: image-availability-exporter
+          image: docker-riskident.2rioffice.com/platform/image-availability-exporter:0.0.10
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /root/.docker/
+              readOnly: true
+              name: docker-pull-secret
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: image-availability-exporter
+  labels:
+      app: image-availability-exporter
+spec:
+  selector:
+    app: image-availability-exporter
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      name: metrics
+  type: NodePort
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-availability-exporter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: image-availability-exporter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: image-availability-exporter
+    namespace: antivax
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: image-availability-exporter
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "pod" ]
+    verbs: [ "get", "list" ]
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: image-availability-exporter
+spec:
+  selector:
+    matchLabels:
+      app: image-availability-exporter
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
