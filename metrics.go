@@ -12,7 +12,7 @@ import (
 var (
 	resolveMissingTotal = promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "iae_image_missing",
+			Name: "image_missing",
 			Help: "Image missing in registry",
 		},
 		[]string{"image"},
