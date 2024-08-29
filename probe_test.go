@@ -39,7 +39,7 @@ func TestImageExistsInRegistry(t *testing.T) {
 		{
 			"When a valid image is used from a private registry then it should return true",
 			args{
-				imageid: "docker-riskident.2rioffice.com/platform/aow-reminder:1.1.0",
+				imageid: "ghcr.io/riskident/image-availability-exporter/busybox:latest",
 			},
 			true,
 			false,
