@@ -3,16 +3,51 @@ package main
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+	"os"
 	"time"
 )
 
+var (
+	port     int
+	interval time.Duration
+)
+
 func main() {
+	app := cli.NewApp()
+	app.Name = "Image Availability Prometheus Exporter"
+	app.Usage = "Expose Prometheus metrics about image availability in your Kubernetes cluster"
+	app.Flags = []cli.Flag{
+		cli.IntFlag{
+			Name:        "port",
+			Value:       8080,
+			Usage:       "Port to expose metrics on",
+			Destination: &port,
+			EnvVar:      "PORT",
+		},
+		cli.DurationFlag{
+			Name:        "interval",
+			Value:       12 * time.Hour,
+			Usage:       "Interval to check images",
+			Destination: &interval,
+			EnvVar:      "INTERVAL",
+		},
+	}
+	app.Action = run
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run(c *cli.Context) error {
 	go func() {
-		err := startMetricsServer(8080)
+		err := startMetricsServer(port)
 		if err != nil {
 			log.Fatalf("error starting metrics server %v", err)
 		}
 	}()
+
+	log.Infof("Starting image availability check every %s", interval)
 
 	for {
 		log.Info("Getting images in pods")
@@ -30,16 +65,16 @@ func main() {
 			}).Info("Checking image")
 			exists, err := imageExistsInRegistry(image)
 			if err != nil {
-				log.Errorf("error checking image %s: %v", image, err)
+				log.Errorf("Error checking image %s: %v", image, err)
 			}
 			if !exists {
-				log.Errorf("image %s not found in registry", image)
+				log.Errorf("Image %s not found in registry", image)
 				resolveMissingTotal.WithLabelValues(image).Set(1)
 			} else {
-				log.Infof("image %s found in registry", image)
+				log.Infof("Image %s found in registry", image)
 				resolveMissingTotal.WithLabelValues(image).Set(0)
 			}
 		}
-		time.Sleep(12 * time.Hour)
+		time.Sleep(interval)
 	}
 }
