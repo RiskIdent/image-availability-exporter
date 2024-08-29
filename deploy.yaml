@@ -34,7 +34,7 @@ spec:
       serviceAccountName: image-availability-exporter
       containers:
         - name: image-availability-exporter
-          image: docker-riskident.2rioffice.com/platform/image-availability-exporter:0.0.11
+          image: ghcr.io/riskident/image-availability-exporter:v0.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
