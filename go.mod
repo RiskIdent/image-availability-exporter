@@ -3,7 +3,7 @@ module github.com/RiskIdent/image-availability-exporter
 go 1.23.0
 
 require (
-	github.com/prometheus/client_golang v1.20.3
+	github.com/prometheus/client_golang v1.20.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli v1.22.15
 	k8s.io/apimachinery v0.31.1
