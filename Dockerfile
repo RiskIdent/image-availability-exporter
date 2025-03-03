@@ -7,6 +7,6 @@ RUN go mod download
 COPY . .
 RUN go build .
 
-FROM docker:27-cli
+FROM docker:28-cli
 COPY --from=builder /app/image-availability-exporter /usr/bin/image-availability-exporter
 ENTRYPOINT ["/usr/bin/image-availability-exporter"]
