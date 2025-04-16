@@ -15,7 +15,11 @@ import (
 // It uses the docker command to check if the image exists in the registry which makes it slow.
 // ToDo: Implement this function without using an external command
 func imageExistsInAnotherRegistry(image string) (bool, error) {
-	cmd := exec.Command("docker", "manifest", "inspect", image)
+	command := []string{"manifest", "inspect", image}
+	if dockerConfigDir != "" {
+		command = []string{"--config", dockerConfigDir, "manifest", "inspect", image}
+	}
+	cmd := exec.Command("docker", command...)
 	var buf bytes.Buffer
 	cmd.Stderr = &buf
 	err := cmd.Run()
