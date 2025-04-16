@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	port     int
-	interval time.Duration
+	port            int
+	interval        time.Duration
+	dockerConfigDir string
 )
 
 func main() {
@@ -32,6 +33,13 @@ func main() {
 			Destination: &interval,
 			EnvVar:      "INTERVAL",
 		},
+		cli.StringFlag{
+			Name:        "docker-config-dir",
+			Value:       "",
+			Usage:       "Directory where the docker config file is located",
+			Destination: &dockerConfigDir,
+			EnvVar:      "DOCKER_CONFIG_DIR",
+		},
 	}
 	app.Action = run
 	if err := app.Run(os.Args); err != nil {
@@ -48,6 +56,10 @@ func run(c *cli.Context) error {
 	}()
 
 	log.Infof("Starting image availability check every %s", interval)
+
+	if dockerConfigDir != "" {
+		log.Infof("Using docker config dir %s", dockerConfigDir)
+	}
 
 	for {
 		log.Info("Getting images in pods")
