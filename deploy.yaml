@@ -36,11 +36,14 @@ spec:
         - name: image-availability-exporter
           image: ghcr.io/riskident/image-availability-exporter:v0.1.1
           imagePullPolicy: IfNotPresent
+          env:
+            - name: DOCKER_CONFIG_DIR
+              value: /docker/
           ports:
             - containerPort: 80
               protocol: TCP
           volumeMounts:
-            - mountPath: /root/.docker/
+            - mountPath: /docker/
               readOnly: true
               name: docker-pull-secret
       restartPolicy: Always
