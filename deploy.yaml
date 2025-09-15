@@ -34,7 +34,7 @@ spec:
       serviceAccountName: image-availability-exporter
       containers:
         - name: image-availability-exporter
-          image: ghcr.io/riskident/image-availability-exporter:v0.2.0
+          image: ghcr.io/riskident/image-availability-exporter:v0.2.1
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCKER_CONFIG_DIR
