@@ -1,5 +1,10 @@
 # image-availability-exporter
 
+## Archived
+
+We have decided to discontinue this piece of software.
+It will no longer receive updates.
+
 A Prometheus exporter exposing metrics about unsupported images in your cluster
 
 ## Description
